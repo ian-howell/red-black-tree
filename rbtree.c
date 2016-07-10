@@ -13,6 +13,7 @@ struct node
     int is_red;
 };
 
+void left_rotate(struct node **root);
 void right_rotate(struct node **root);
 
 struct node *create_node(struct node *p, int x);
@@ -74,6 +75,32 @@ int main(int argc, char *argv[])
     delete_tree(&my_tree);
 
     return 0;
+}
+
+void left_rotate(struct node **root)
+{
+    struct node *x = *root;
+    struct node *y = x->right;
+
+    x->right = y->left;
+    if (x->right != NULL)
+        x->right->parent = x;
+
+    y->parent = x->parent;
+
+    if (x->parent == NULL)
+    {
+        *root = y;
+    }
+    else
+    {
+        if (x == x->parent->left)
+            x->parent->left = y;
+        else
+            x->parent->right = y;
+    }
+    y->left = x;
+    x->parent = y;
 }
 
 void right_rotate(struct node **root)
