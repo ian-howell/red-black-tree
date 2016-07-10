@@ -110,6 +110,9 @@ void rb_insert(struct node **root, int x)
     else
         printf("Since %d is already in the tree, it was not inserted\n", x);
 
+    if ((*p)->parent == NULL)
+        (*p)->is_red = 0;
+
     return;
 }
 
