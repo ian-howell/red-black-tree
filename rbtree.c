@@ -2,22 +2,31 @@
 #include <stdlib.h>
 #include <time.h>
 
-const int BUFFER = 80;
-
 struct node
 {
     int data;
     struct node *left;
     struct node *right;
     struct node *parent;
-    int is_red;
+    int color;
 };
+
+enum
+{
+    BLACK,
+    RED
+};
+
+int get_color(struct node *root)
+{
+    return (root == NULL) ? BLACK : root->color;
+}
 
 void left_rotate(struct node **root);
 void right_rotate(struct node **root);
 
 struct node *create_node(struct node *p, int x);
-void rb_insert(struct node **root, int x);
+void rb_insert(struct node **root, int d);
 void delete_tree(struct node **root);
 
 void inorder(struct node *root);
@@ -126,6 +135,8 @@ void right_rotate(struct node **root)
     }
     y->right = x;
     x->parent = y;
+
+    return;
 }
 
 struct node *create_node(struct node *p, int x)
@@ -138,7 +149,7 @@ struct node *create_node(struct node *p, int x)
         new_node->left = NULL;
         new_node->right = NULL;
         new_node->parent = p;
-        new_node->is_red = 1;
+        new_node->color = RED;
     }
 
     return new_node;
@@ -223,7 +234,7 @@ void to_dot(struct node *root, const char filename[])
 void r_to_dot(struct node *root, FILE *f)
 {
     static int null_count = 0;
-    const char *color = ((root->is_red) ? "red" : "black");
+    const char *color = ((root->color == RED) ? "red" : "black");
 
     // Generate the data for this node
     fprintf(f, "\t%ld [label=\"%d\" color=\"%s\"];\n", (long)root,
