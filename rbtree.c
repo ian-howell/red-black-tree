@@ -195,7 +195,6 @@ void r_to_dot(struct node *root, FILE *f)
 
         // Increment the null count
         null_count++;
-        return;
     }
 
     if (root->right != NULL)
@@ -213,7 +212,6 @@ void r_to_dot(struct node *root, FILE *f)
 
         // Increment the null count
         null_count++;
-        return;
     }
 
     return;
