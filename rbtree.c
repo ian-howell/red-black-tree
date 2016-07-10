@@ -166,6 +166,8 @@ void to_dot(struct node *root, const char filename[])
     r_to_dot(root, f);
     fprintf(f, "}\n");
 
+    fclose(f);
+
     return;
 }
 
