@@ -100,23 +100,15 @@ void rb_insert(struct node **root, int x)
         pprime = *p;
 
         if (x < (*p)->data)
-        {
             p = &(*p)->left;
-        }
         else if (x > (*p)->data)
-        {
             p = &(*p)->right;
-        }
     }
 
     if (*p == NULL)
-    {
         *p = create_node(pprime , x);
-    }
     else
-    {
         printf("Since %d is already in the tree, it was not inserted\n", x);
-    }
 
     return;
 }
