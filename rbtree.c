@@ -224,7 +224,7 @@ void preorder(struct node *root)
 void to_dot(struct node *root, const char filename[])
 {
     FILE *f = fopen(filename, "w");
-    
+
     fprintf(f, "digraph tree {\n");
     r_to_dot(root, f);
     fprintf(f, "}\n");
@@ -262,10 +262,11 @@ void r_to_dot(struct node *root, FILE *f)
     else
     {
         // Create a new null point
-        fprintf(f, "\tnull%d [shape=point color=\"black\"];\n", null_count);
+        //fprintf(f, "\tnull%d [shape=point color=\"black\"];\n", null_count);
 
         // Point at the null point
         fprintf(f, "\t%ld -> null%d\n", (long)root, null_count);
+        fprintf(f, "\tnull%d -> %ld\n", null_count, (long)root);
 
         // Increment the null count
         null_count++;
@@ -279,10 +280,11 @@ void r_to_dot(struct node *root, FILE *f)
     else
     {
         // Create a new null point
-        fprintf(f, "\tnull%d [shape=point color=\"black\"];\n", null_count);
+        //fprintf(f, "\tnull%d [shape=point color=\"black\"];\n", null_count);
 
         // Point at the null point
         fprintf(f, "\t%ld -> null%d\n", (long)root, null_count);
+        fprintf(f, "\tnull%d -> %ld\n", null_count, (long)root);
 
         // Increment the null count
         null_count++;
