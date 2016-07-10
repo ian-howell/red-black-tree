@@ -155,28 +155,31 @@ struct node *create_node(struct node *p, int x)
     return new_node;
 }
 
-void rb_insert(struct node **root, int x)
+void rb_insert(struct node **root, int d)
 {
-    struct node **p = root;
-    struct node *pprime = NULL;
+    struct node **x = root;
+    struct node *p = NULL;
 
-    while (*p != NULL && (*p)->data != x)
+    while (*x != NULL && (*x)->data != d)
     {
-        pprime = *p;
-
-        if (x < (*p)->data)
-            p = &(*p)->left;
-        else if (x > (*p)->data)
-            p = &(*p)->right;
+        p = *x;
+        if (d < (*x)->data)
+            x = &(*x)->left;
+        else if (d > (*x)->data)
+            x = &(*x)->right;
     }
 
-    if (*p == NULL)
-        *p = create_node(pprime , x);
+    if (*x == NULL)
+        *x = create_node(p, d);
     else
-        printf("Since %d is already in the tree, it was not inserted\n", x);
+        printf("Since %d is already in the tree, it was not inserted\n", d);
 
-    if ((*p)->parent == NULL)
-        (*p)->is_red = 0;
+    while (p != NULL && p->parent != NULL)
+    {
+        p = p->parent;
+    }
+
+    *root = (p == NULL) ? *root : p;
 
     return;
 }
