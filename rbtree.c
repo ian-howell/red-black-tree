@@ -28,22 +28,31 @@ int main(int argc, char *argv[])
 
     struct node *my_tree = NULL;
 
-    /*
-    rb_insert(&my_tree, 54);
-    rb_insert(&my_tree, 30);
-    rb_insert(&my_tree, 84);
-    rb_insert(&my_tree, 12);
-    rb_insert(&my_tree, 23);
-    rb_insert(&my_tree, 42);
-    */
+    rb_insert(&my_tree, 81);
+    rb_insert(&my_tree, 49);
+    rb_insert(&my_tree, 14);
+    rb_insert(&my_tree, 76);
+    rb_insert(&my_tree, 56);
 
+    rb_insert(&my_tree, 41);
+    rb_insert(&my_tree, 72);
+    rb_insert(&my_tree, 42);
+    rb_insert(&my_tree, 60);
+    rb_insert(&my_tree, 6);
+
+    rb_insert(&my_tree, 66);
+    rb_insert(&my_tree, 75);
+    rb_insert(&my_tree, 47);
+    rb_insert(&my_tree, 58);
+    rb_insert(&my_tree, 19);
+
+    /*
     int i = 0;
     for (i = 0; i < 50; i++)
     {
         rb_insert(&my_tree, rand() % 100);
     }
-
-
+    */
 
     if (argc == 2)
     {
