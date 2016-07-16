@@ -28,6 +28,7 @@ int get_color(struct node *root)
 
 void left_rotate(struct node **root);
 void right_rotate(struct node **root);
+void rotate(struct node **root, int dir);
 
 struct node *create_node(int x);
 void rb_insert(struct node **root, int d);
@@ -88,6 +89,18 @@ int main(int argc, char *argv[])
     delete_tree(&my_tree);
 
     return 0;
+}
+
+void rotate(struct node **root, int dir)
+{
+    if (dir == LEFT)
+    {
+        left_rotate(root);
+    }
+    else
+    {
+        right_rotate(root);
+    }
 }
 
 void left_rotate(struct node **root)
