@@ -176,10 +176,57 @@ void rb_insert(struct node **root, int d)
 
     while (p != NULL && p->parent != NULL)
     {
+        // all of the rebalancing goes somewhere in here
+        struct node *c = p;
         p = p->parent;
+
+        if (get_color(c) == RED)
+        {
+            struct node *u = p->left;
+            if (c == u)
+                u = p->right;
+
+            if (get_color(u) == RED)
+            {
+                // CASE 1
+                p->color = RED;
+                c->color = BLACK;
+                u->color = BLACK;
+            }
+            else
+            {
+                if (c == p->right)
+                {
+                    // CASE A:
+                    struct node *gc = c->right;
+                    if (get_color(gc) == BLACK) // CASE 2: zig-zag
+                        right_rotate(&c);
+                    // CASE 3: zig-zig
+                    // recolor first for simplicity
+                    p->color = RED;
+                    p->right->color = BLACK;
+                    left_rotate(&p);
+                }
+                else
+                {
+                    // CASE B:
+                    struct node *gc = c->left;
+                    if (get_color(gc) == BLACK) // CASE 2: zig-zag
+                        left_rotate(&c);
+                    // CASE 3: zig-zig
+                    // recolor first for simplicity
+                    p->color = RED;
+                    p->left->color = BLACK;
+                    right_rotate(&p);
+                }
+            }
+        }
     }
 
     *root = (p == NULL) ? *root : p;
+
+    // Fix violation 1 errors
+    (*root)->color = BLACK;
 
     return;
 }
