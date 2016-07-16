@@ -31,6 +31,7 @@ void right_rotate(struct node **root);
 void rotate(struct node **root, int dir);
 
 struct node *create_node(int x);
+void rb_insert_r(struct node **root, int d);
 void rb_insert(struct node **root, int d);
 void delete_tree(struct node **root);
 
@@ -146,76 +147,56 @@ struct node *create_node(int x)
 
 void rb_insert(struct node **root, int d)
 {
-    struct node **x = root;
-    struct node *p = NULL;
+    rb_insert_r(root, d);
+    (*root)->color = BLACK;
 
-    while (*x != NULL && (*x)->data != d)
+    return;
+}
+
+void rb_insert_r(struct node **root, int d)
+{
+    if (*root == NULL)
     {
-        p = *x;
-        if (d < (*x)->data)
-            x = &(*x)->left;
-        else if (d > (*x)->data)
-            x = &(*x)->right;
+        *root = create_node(d);
     }
-
-    if (*x == NULL)
-        *x = create_node(p, d);
-    else
-        printf("Since %d is already in the tree, it was not inserted\n", d);
-
-    while (p != NULL && p->parent != NULL)
+    else if ((*root)->data != d)
     {
-        // all of the rebalancing goes somewhere in here
-        struct node *c = p;
-        p = p->parent;
+        int dir = d > (*root)->data;
 
-        if (get_color(c) == RED)
+        rb_insert_r(&(*root)->link[dir], d);
+
+        /* Begin rebalancing */
+        if (get_color((*root)->link[dir]) == RED)
         {
-            struct node *u = p->left;
-            if (c == u)
-                u = p->right;
-
-            if (get_color(u) == RED)
+            if (get_color((*root)->link[!dir]) == RED)
             {
-                // CASE 1
-                p->color = RED;
-                c->color = BLACK;
-                u->color = BLACK;
+                /* CASE 1 */
+                (*root)->color = RED;
+                (*root)->link[LEFT]->color = BLACK;
+                (*root)->link[RIGHT]->color = BLACK;
             }
             else
             {
-                if (c == p->right)
+                /* CASE 2 and 3 */
+                if (get_color((*root)->link[dir]->link[!dir]) == RED)
                 {
-                    // CASE A:
-                    struct node *gc = c->right;
-                    if (get_color(gc) == BLACK) // CASE 2: zig-zag
-                        right_rotate(&c);
-                    // CASE 3: zig-zig
-                    // recolor first for simplicity
-                    p->color = RED;
-                    p->right->color = BLACK;
-                    left_rotate(&p);
+                    /* CASE 2 */
+                    rotate(&(*root)->link[dir], dir);
                 }
-                else
+                /* CASE 3 */
+                if (get_color((*root)->link[dir]->link[dir]) == RED)
                 {
-                    // CASE B:
-                    struct node *gc = c->left;
-                    if (get_color(gc) == BLACK) // CASE 2: zig-zag
-                        left_rotate(&c);
-                    // CASE 3: zig-zig
-                    // recolor first for simplicity
-                    p->color = RED;
-                    p->left->color = BLACK;
-                    right_rotate(&p);
+                    (*root)->link[dir]->color = BLACK;
+                    (*root)->color = RED;
+                    rotate(root, !dir);
                 }
             }
         }
     }
-
-    *root = (p == NULL) ? *root : p;
-
-    // Fix violation 1 errors
-    (*root)->color = BLACK;
+    else
+    {
+        printf("Since %d is already in the tree, it was not inserted\n", d);
+    }
 
     return;
 }
