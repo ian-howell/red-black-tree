@@ -5,9 +5,7 @@
 struct node
 {
     int data;
-    struct node *left;
-    struct node *right;
-    struct node *parent;
+    struct node *link[2];
     int color;
 };
 
@@ -15,6 +13,12 @@ enum
 {
     BLACK,
     RED
+};
+
+enum
+{
+    LEFT,
+    RIGHT
 };
 
 int get_color(struct node *root)
@@ -25,7 +29,7 @@ int get_color(struct node *root)
 void left_rotate(struct node **root);
 void right_rotate(struct node **root);
 
-struct node *create_node(struct node *p, int x);
+struct node *create_node(int x);
 void rb_insert(struct node **root, int d);
 void delete_tree(struct node **root);
 
@@ -89,66 +93,38 @@ int main(int argc, char *argv[])
 void left_rotate(struct node **root)
 {
     struct node *x = *root;
-    struct node *y = x->right;
+    struct node *y = x->link[RIGHT];
 
-    x->right = y->left;
-    if (x->right != NULL)
-        x->right->parent = x;
+    x->link[RIGHT] = y->link[LEFT];
+    y->link[LEFT] = x;
 
-    y->parent = x->parent;
+    *root = y;
 
-    if (x->parent == NULL)
-    {
-        *root = y;
-    }
-    else
-    {
-        if (x == x->parent->left)
-            x->parent->left = y;
-        else
-            x->parent->right = y;
-    }
-    y->left = x;
-    x->parent = y;
+    return;
 }
 
 void right_rotate(struct node **root)
 {
     struct node *x = *root;
-    struct node *y = x->left;
+    struct node *y = x->link[LEFT];
 
-    x->left = y->right;
-    if (y->right != NULL)
-        y->right->parent = x;
-    y->parent = x->parent;
+    x->link[LEFT] = y->link[RIGHT];
+    y->link[RIGHT] = x;
 
-    if (x->parent == NULL)
-    {
-        *root = y;
-    }
-    else
-    {
-        if (x == x->parent->left)
-            x->parent->left = y;
-        else
-            x->parent->right = y;
-    }
-    y->right = x;
-    x->parent = y;
+    *root = y;
 
     return;
 }
 
-struct node *create_node(struct node *p, int x)
+struct node *create_node(int x)
 {
     struct node *new_node = (struct node *)malloc(sizeof(struct node));
 
     if (new_node != NULL)
     {
         new_node->data = x;
-        new_node->left = NULL;
-        new_node->right = NULL;
-        new_node->parent = p;
+        new_node->link[LEFT] = NULL;
+        new_node->link[RIGHT] = NULL;
         new_node->color = RED;
     }
 
@@ -238,8 +214,8 @@ void delete_tree(struct node **root)
         return;
     }
 
-    delete_tree(&((*root)->left));
-    delete_tree(&((*root)->right));
+    delete_tree(&((*root)->link[LEFT]));
+    delete_tree(&((*root)->link[RIGHT]));
 
     free(*root);
     *root = NULL;
@@ -251,10 +227,9 @@ void inorder(struct node *root)
 {
     if (root != NULL)
     {
-        inorder(root->left);
-        printf("parent = %p\n", (void*)root->parent);
+        inorder(root->link[LEFT]);
         printf("%d\n", root->data);
-        inorder(root->right);
+        inorder(root->link[RIGHT]);
     }
 }
 
@@ -263,8 +238,8 @@ void preorder(struct node *root)
     if (root != NULL)
     {
         printf("%d ", root->data);
-        preorder(root->left);
-        preorder(root->right);
+        preorder(root->link[LEFT]);
+        preorder(root->link[RIGHT]);
     }
 }
 
@@ -290,48 +265,36 @@ void r_to_dot(struct node *root, FILE *f)
     fprintf(f, "\t%ld [label=\"%d\" color=\"%s\"];\n", (long)root,
             root->data, color);
 
-    // Generate the data for this node's parent
-    if (root->parent != NULL)
-    {
-        fprintf(f, "\t%ld -> %ld\n", (long)root, (long)root->parent);
-    }
-    else
-    {
-        fprintf(f, "\tROOT -> %ld [dir=\"back\"]\n", (long)root);
-    }
-
     // Generate the data for this node's left child
-    if (root->left != NULL)
+    if (root->link[LEFT] != NULL)
     {
-        fprintf(f, "\t%ld -> %ld\n", (long)root, (long)root->left);
-        r_to_dot(root->left, f);
+        fprintf(f, "\t%ld -> %ld\n", (long)root, (long)root->link[LEFT]);
+        r_to_dot(root->link[LEFT], f);
     }
     else
     {
         // Create a new null point
-        //fprintf(f, "\tnull%d [shape=point color=\"black\"];\n", null_count);
+        fprintf(f, "\tnull%d [shape=point color=\"black\"];\n", null_count);
 
         // Point at the null point
         fprintf(f, "\t%ld -> null%d\n", (long)root, null_count);
-        fprintf(f, "\tnull%d -> %ld\n", null_count, (long)root);
 
         // Increment the null count
         null_count++;
     }
 
-    if (root->right != NULL)
+    if (root->link[RIGHT] != NULL)
     {
-        fprintf(f, "\t%ld -> %ld\n", (long)root, (long)root->right);
-        r_to_dot(root->right, f);
+        fprintf(f, "\t%ld -> %ld\n", (long)root, (long)root->link[RIGHT]);
+        r_to_dot(root->link[RIGHT], f);
     }
     else
     {
         // Create a new null point
-        //fprintf(f, "\tnull%d [shape=point color=\"black\"];\n", null_count);
+        fprintf(f, "\tnull%d [shape=point color=\"black\"];\n", null_count);
 
         // Point at the null point
         fprintf(f, "\t%ld -> null%d\n", (long)root, null_count);
-        fprintf(f, "\tnull%d -> %ld\n", null_count, (long)root);
 
         // Increment the null count
         null_count++;
