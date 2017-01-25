@@ -1,0 +1,6 @@
+# Graphical files
+*.ps
+*.gv
+
+# Executables
+a.out
