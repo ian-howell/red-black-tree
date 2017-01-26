@@ -33,6 +33,7 @@ void rotate(struct node **root, int dir);
 struct node *create_node(int x);
 void rb_insert_r(struct node **root, int d);
 void rb_insert(struct node **root, int d);
+void balance(struct node **root, int dir);
 void delete_tree(struct node **root);
 
 void inorder(struct node *root);
@@ -42,39 +43,46 @@ void r_to_dot(struct node *root, FILE *f);
 
 int main(int argc, char *argv[])
 {
-    srand(time(NULL));
+    if (argc < 2)
+    {
+        printf("Usage: %s <output_type> [filename]\n", argv[0]);
+        return 0;
+    }
 
     struct node *my_tree = NULL;
 
-    rb_insert(&my_tree, 81);
-    rb_insert(&my_tree, 49);
-    rb_insert(&my_tree, 14);
-    rb_insert(&my_tree, 76);
-    rb_insert(&my_tree, 56);
-
-    rb_insert(&my_tree, 41);
-    rb_insert(&my_tree, 72);
-    rb_insert(&my_tree, 42);
-    rb_insert(&my_tree, 60);
-    rb_insert(&my_tree, 6);
-
-    rb_insert(&my_tree, 66);
-    rb_insert(&my_tree, 75);
-    rb_insert(&my_tree, 47);
-    rb_insert(&my_tree, 58);
-    rb_insert(&my_tree, 19);
-
-    /*
-    int i = 0;
-    for (i = 0; i < 50; i++)
+    if (argv[1][0] == '0')
     {
-        rb_insert(&my_tree, rand() % 100);
+        srand(time(NULL));
+
+        int i = 0;
+        for (i = 0; i < 500; i++)
+        {
+            rb_insert(&my_tree, rand() % 100000);
+        }
     }
-    */
-
-    if (argc == 2)
+    else if (argv[1][0] == '1')
     {
-        to_dot(my_tree, argv[1]);
+        int my_input[15] = { 81, 49, 14, 76, 56,
+                             41, 72, 42, 60,  6,
+                             66, 75, 47, 58, 19 };
+
+        int i = 0;
+        for (i = 0; i < 15; i++)
+        {
+            rb_insert(&my_tree, my_input[i]);
+        }
+    }
+    else
+    {
+        printf("<output_type> may be '0' for random data or '1' for "
+               "pregenerated data\n");
+        return 0;
+    }
+
+    if (argc == 3)
+    {
+        to_dot(my_tree, argv[2]);
     }
     else
     {
@@ -82,7 +90,7 @@ int main(int argc, char *argv[])
         inorder(my_tree);
         printf("\n");
 
-        printf("Preorder: ");
+        printf("Preorder:\n");
         preorder(my_tree);
         printf("\n");
     }
@@ -95,13 +103,9 @@ int main(int argc, char *argv[])
 void rotate(struct node **root, int dir)
 {
     if (dir == LEFT)
-    {
         left_rotate(root);
-    }
     else
-    {
         right_rotate(root);
-    }
 }
 
 void left_rotate(struct node **root)
@@ -166,32 +170,7 @@ void rb_insert_r(struct node **root, int d)
         rb_insert_r(&(*root)->link[dir], d);
 
         /* Begin rebalancing */
-        if (get_color((*root)->link[dir]) == RED)
-        {
-            if (get_color((*root)->link[!dir]) == RED)
-            {
-                /* CASE 1 */
-                (*root)->color = RED;
-                (*root)->link[LEFT]->color = BLACK;
-                (*root)->link[RIGHT]->color = BLACK;
-            }
-            else
-            {
-                /* CASE 2 and 3 */
-                if (get_color((*root)->link[dir]->link[!dir]) == RED)
-                {
-                    /* CASE 2 */
-                    rotate(&(*root)->link[dir], dir);
-                }
-                /* CASE 3 */
-                if (get_color((*root)->link[dir]->link[dir]) == RED)
-                {
-                    (*root)->link[dir]->color = BLACK;
-                    (*root)->color = RED;
-                    rotate(root, !dir);
-                }
-            }
-        }
+        balance(root, dir);
     }
     else
     {
@@ -201,12 +180,40 @@ void rb_insert_r(struct node **root, int d)
     return;
 }
 
+void balance(struct node **root, int dir)
+{
+    if (get_color((*root)->link[dir]) == RED)
+    {
+        if (get_color((*root)->link[!dir]) == RED)
+        {
+            /* CASE 1 */
+            (*root)->color = RED;
+            (*root)->link[LEFT]->color = BLACK;
+            (*root)->link[RIGHT]->color = BLACK;
+        }
+        else
+        {
+            /* CASE 2 and 3 */
+            if (get_color((*root)->link[dir]->link[!dir]) == RED)
+            {
+                /* CASE 2 */
+                rotate(&(*root)->link[dir], dir);
+            }
+            /* CASE 3 */
+            if (get_color((*root)->link[dir]->link[dir]) == RED)
+            {
+                (*root)->link[dir]->color = BLACK;
+                (*root)->color = RED;
+                rotate(root, !dir);
+            }
+        }
+    }
+}
+
 void delete_tree(struct node **root)
 {
     if (*root == NULL)
-    {
         return;
-    }
 
     delete_tree(&((*root)->link[LEFT]));
     delete_tree(&((*root)->link[RIGHT]));
@@ -231,7 +238,7 @@ void preorder(struct node *root)
 {
     if (root != NULL)
     {
-        printf("%d ", root->data);
+        printf("%d\n", root->data);
         preorder(root->link[LEFT]);
         preorder(root->link[RIGHT]);
     }
@@ -242,11 +249,13 @@ void to_dot(struct node *root, const char filename[])
     FILE *f = fopen(filename, "w");
 
     fprintf(f, "digraph tree {\n");
-    r_to_dot(root, f);
+    if (root)
+        r_to_dot(root, f);
+    else
+        fprintf(f, "\tGit rekt son;\n");
     fprintf(f, "}\n");
 
     fclose(f);
-
     return;
 }
 
