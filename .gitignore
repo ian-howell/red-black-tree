@@ -4,3 +4,7 @@
 
 # Executables
 a.out
+driver
+
+# Object files
+*.o
