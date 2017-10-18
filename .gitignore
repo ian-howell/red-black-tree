@@ -1,6 +1,6 @@
-# Graphical files
-*.ps
+# Graphvix files
 *.gv
+*.dot
 
 # Executables
 a.out
